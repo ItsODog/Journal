@@ -3,7 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <title>Journal</title>
+    <!-- Add viewport meta tag for responsive scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Georgia, serif;
             background-color: floralwhite;
@@ -11,18 +17,25 @@
             display: flex;
             justify-content: center;
             padding: 20px;
+            margin: 0;
         }
 
         .container {
             display: flex;
             gap: 40px;
             align-items: flex-start;
-            width: 1000px;
+            width: 100%;
+            max-width: 1000px;
+            /* allow it to shrink on smaller screens */
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         #savedEntriesWrapper {
             width: 300px;
             margin-top: 44px;
+            min-width: 280px;
+            flex-shrink: 0;
         }
 
         #savedList {
@@ -30,7 +43,7 @@
             border: 1px solid #f1e5cf;
             background-color: #fffdf9;
             border-radius: 6px;
-            max-height: 1000px;
+            max-height: 80vh; /* Use viewport height to avoid overflow */
             overflow-y: auto;
         }
 
@@ -77,7 +90,10 @@
         .editor-area {
             display: flex;
             flex-direction: column;
-            width: 700px;
+            width: 100%;
+            max-width: 700px;
+            min-width: 280px;
+            flex-shrink: 1;
         }
 
         .toolbar {
@@ -109,7 +125,9 @@
                 }
 
         #editor {
-            height: 1000px;
+            /* height reduced and made responsive */
+            height: 70vh;
+            max-height: 1000px;
             background-color: #fffdf9;
             border: 2px solid #f1e5cf;
             padding: 24px;
@@ -121,12 +139,29 @@
             word-wrap: break-word;
             overflow-y: auto;
             min-height: 200px;
+            resize: vertical; /* allow user resizing if desired */
         }
 
         .buttons {
             margin-top: 10px;
             display: flex;
             gap: 10px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            #editor {
+                font-size: 16px;
+                padding: 16px;
+            }
+
+            .toolbar button,
+            .buttons button {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
         }
     </style>
 </head>
@@ -377,5 +412,4 @@
     </script>
 </body>
 </html>
-
 
