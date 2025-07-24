@@ -18,7 +18,6 @@
             gap: 40px;
             align-items: flex-start;
             width: 1000px;
-            height: 70vh;
         }
 
         #savedEntriesWrapper {
@@ -110,7 +109,7 @@
                 }
 
         #editor {
-            height: 1000px;
+            height: 600px;
             background-color: #fffdf9;
             border: 2px solid #f1e5cf;
             padding: 24px;
@@ -130,12 +129,13 @@
             gap: 10px;
         }
 
-        /* Responsive styles for smaller screens */
+        /* Responsive styles */
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
                 width: 100%;
                 height: auto;
+                padding: 10px;
             }
 
             #savedEntriesWrapper {
@@ -153,6 +153,32 @@
 
             #editor {
                 height: 300px;
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .toolbar button,
+            .buttons button {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+
+            #savedList {
+                font-size: 14px;
+                padding: 6px;
+            }
+
+            .entry-date {
+                font-size: 11px;
+            }
+
+            .entry-title {
+                font-size: 13px;
+            }
+
+            .entry-buttons button {
+                font-size: 12px;
+                padding: 4px 8px;
             }
         }
     </style>
@@ -404,4 +430,3 @@
     </script>
 </body>
 </html>
-
