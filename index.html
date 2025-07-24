@@ -3,13 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Journal</title>
-    <!-- Add viewport meta tag for responsive scaling -->
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
         body {
             font-family: Georgia, serif;
             background-color: floralwhite;
@@ -17,31 +11,19 @@
             display: flex;
             justify-content: center;
             padding: 20px;
-            margin: 0;
         }
 
         .container {
-          display: flex;
-          flex-direction: row;
-          flex-wrap: nowrap;
-          gap: 40px;
-          align-items: flex-start;
-          width: 1000px;
-          height: 70vh;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            width: 1000px;
+            height: 70vh;
         }
 
         #savedEntriesWrapper {
-          width: 300px;
-          max-height: 100%;
-          overflow-y: auto;
-          margin-top: 0;
-        }
-
-        .editor-area {
-          flex-grow: 1;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
+            width: 300px;
+            margin-top: 44px;
         }
 
         #savedList {
@@ -49,7 +31,7 @@
             border: 1px solid #f1e5cf;
             background-color: #fffdf9;
             border-radius: 6px;
-            max-height: 80vh;
+            max-height: 1000px;
             overflow-y: auto;
         }
 
@@ -94,10 +76,9 @@
             }
 
         .editor-area {
-            width: 700px;
-            height: 70vh;
             display: flex;
             flex-direction: column;
+            width: 700px;
         }
 
         .toolbar {
@@ -129,10 +110,7 @@
                 }
 
         #editor {
-            flex-grow: 1;
-            min-height: 0;
-            overflow-y: auto;
-            height: auto;
+            height: 1000px;
             background-color: #fffdf9;
             border: 2px solid #f1e5cf;
             padding: 24px;
@@ -142,6 +120,8 @@
             outline: none;
             white-space: pre-wrap;
             word-wrap: break-word;
+            overflow-y: auto;
+            min-height: 200px;
         }
 
         .buttons {
@@ -149,20 +129,30 @@
             display: flex;
             gap: 10px;
         }
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
+
+        /* Responsive styles for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 100%;
+                height: auto;
+            }
+
+            #savedEntriesWrapper {
+                width: 100%;
+                max-height: 200px;
+                overflow-y: auto;
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            .editor-area {
+                width: 100%;
+                height: auto;
             }
 
             #editor {
-                font-size: 16px;
-                padding: 16px;
-            }
-
-            .toolbar button,
-            .buttons button {
-                font-size: 12px;
-                padding: 5px 10px;
+                height: 300px;
             }
         }
     </style>
