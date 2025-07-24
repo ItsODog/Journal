@@ -24,18 +24,21 @@
             display: flex;
             gap: 40px;
             align-items: flex-start;
-            width: 100%;
-            max-width: 1000px;
-            /* allow it to shrink on smaller screens */
-            flex-wrap: wrap;
-            justify-content: center;
+            width: 1000px; /* or wider if needed */
+            flex-wrap: nowrap; /* prevent wrapping */
         }
 
         #savedEntriesWrapper {
             width: 300px;
             margin-top: 44px;
-            min-width: 280px;
-            flex-shrink: 0;
+            flex-shrink: 0; /* prevent shrinking */
+        }
+
+        .editor-area {
+            display: flex;
+            flex-direction: column;
+            width: 700px; /* adjust as needed */
+            flex-shrink: 0; /* prevent shrinking */
         }
 
         #savedList {
@@ -88,12 +91,10 @@
             }
 
         .editor-area {
+            width: 700px;
+            height: 70vh; /* limit overall editor area height */
             display: flex;
             flex-direction: column;
-            width: 100%;
-            max-width: 700px;
-            min-width: 280px;
-            flex-shrink: 1;
         }
 
         .toolbar {
@@ -125,9 +126,10 @@
                 }
 
         #editor {
-            /* height reduced and made responsive */
-            height: 45vh;
-            max-height: 1000px;
+            flex-grow: 1; /* fills remaining vertical space */
+            min-height: 0; /* avoid flexbox issues */
+            overflow-y: auto;
+            height: auto; /* no fixed height */
             background-color: #fffdf9;
             border: 2px solid #f1e5cf;
             padding: 24px;
@@ -137,9 +139,6 @@
             outline: none;
             white-space: pre-wrap;
             word-wrap: break-word;
-            overflow-y: auto;
-            min-height: 200px;
-            resize: vertical; /* allow user resizing if desired */
         }
 
         .buttons {
