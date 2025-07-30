@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Journal with LaTeX Preview</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background-color: floralwhite;
+            color: #4e4d4c;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            width: 1000px;
+        }
+
+        #savedEntriesWrapper {
+            width: 300px;
+            margin-top: 44px;
+        }
+
+        #savedList {
+            padding: 10px;
+            border: 1px solid #f1e5cf;
+            background-color: #fffdf9;
+            border-radius: 6px;
+            max-height: 1000px;
+            overflow-y: auto;
+        }
+
+            #savedList div {
+                margin-bottom: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                border-bottom: 1px solid #e0d6c6;
+                padding-bottom: 6px;
+            }
+
+        .entry-date {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .entry-title {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .entry-buttons {
+            margin-top: 4px;
+            display: flex;
+            gap: 8px;
+        }
+
+        #savedList .entry-buttons button {
+            font-size: 14px;
+            background-color: #cdc5b4;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+            #savedList .entry-buttons button:hover {
+                background-color: #858178;
+            }
+
+        .editor-area {
+            display: flex;
+            flex-direction: column;
+            width: 700px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+            .toolbar button,
+            .buttons button {
+                background-color: #cdc5b4;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background-color 0.2s ease;
+            }
+
+                .toolbar button:hover,
+                .buttons button:hover {
+                    background-color: #858178;
+                }
+
+                .toolbar button.active {
+                    background-color: #4e4d4c;
+                }
+
+        .editor-preview-wrapper {
+            position: relative;
+            width: 700px;
+            height: 1000px;
+            border: 2px solid #f1e5cf;
+            background-color: #fffdf9;
+            padding: 24px;
+            font-size: 18px;
+            font-family: Georgia, serif;
+            line-height: 1.6;
+            overflow-y: auto;
+        }
+
+        #editor,
+        #latexPreview {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            right: 24px;
+            bottom: 24px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: transparent;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #editor {
+            outline: none;
+            z-index: 2;
+        }
+
+        #latexPreview {
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+            user-select: text;
+            color: #4e4d4c;
+            white-space: normal;
+        }
+
+        .preview-active #editor {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .preview-active #latexPreview {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 3;
+        }
+
+        .buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 100%;
+                height: auto;
+                padding: 10px;
+            }
+
+            #savedEntriesWrapper {
+                width: 100%;
+                max-height: 200px;
+                overflow-y: auto;
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            .editor-area {
+                width: 100%;
+                height: auto;
+            }
+
+            .editor-preview-wrapper {
+                width: 100%;
+                height: 300px;
+                padding: 12px;
+            }
+
+            #editor,
+            #latexPreview {
+                top: 12px;
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                font-size: 14px;
+            }
+
+            .toolbar button,
+            .buttons button {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+
+            #savedList {
+                font-size: 14px;
+                padding: 6px;
+            }
+
+            .entry-date {
+                font-size: 11px;
+            }
+
+            .entry-title {
+                font-size: 13px;
+            }
+
+            .entry-buttons button {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+        }
+
+        #latexPreview {
+            text-align: left;
+        }
+
+            #latexPreview .katex-display {
+                display: block !important;
+                margin: 1em auto !important;
+                padding: 0 !important;
+                margin-top: 1.2em !important;
+                margin-bottom: 0em !important;
+                text-align: center;
+            }
+
+            #latexPreview .katex {
+                margin: 0 !important;
+                padding: 0 !important;
+                line-height: 1.4 !important;
+                vertical-align: middle !important;
+            }
+
+            #latexPreview p {
+                margin: 0.7em 0;
+                line-height: 1.4;
+            }
+
+            #latexPreview p,
+            #latexPreview > div,
+            #latexPreview > * {
+                margin: 0.6em 0;
+                line-height: 1.4;
+            }
+    </style>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+          crossorigin="anonymous" />
+</head>
+<body>
+    <div class="container">
+        <div id="savedEntriesWrapper">
+            <div id="savedList">No saved entries yet.</div>
+        </div>
+
+        <div class="editor-area">
+            <div class="toolbar">
+                <button onclick="document.execCommand('bold'); updateFormattingStates();"><b>B</b></button>
+                <button onclick="document.execCommand('italic'); updateFormattingStates();"><i>I</i></button>
+                <button onclick="document.execCommand('underline'); updateFormattingStates();"><u>U</u></button>
+                <button onclick="document.execCommand('insertUnorderedList'); updateFormattingStates();">• List</button>
+            </div>
+
+            <div class="editor-preview-wrapper">
+                <div id="editor" contenteditable="true" spellcheck="false"></div>
+                <div id="latexPreview"></div>
+            </div>
+
+            <div class="buttons">
+                <button id="saveBtn">Save</button>
+                <button id="newEntryBtn">New Entry</button>
+                <button id="latexPreviewBtn">LaTeX Preview</button>
+                <button id="backToEditorBtn" style="display:none;">Back to Editor</button>
+            </div>
+        </div>
+    </div>
+
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"
+            crossorigin="anonymous"></script>
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+            crossorigin="anonymous"></script>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const saveBtn = document.getElementById('saveBtn');
+        const newEntryBtn = document.getElementById('newEntryBtn');
+        const latexPreviewBtn = document.getElementById('latexPreviewBtn');
+        const backToEditorBtn = document.getElementById('backToEditorBtn');
+        const latexPreview = document.getElementById('latexPreview');
+        const savedList = document.getElementById('savedList');
+        const editorArea = document.querySelector('.editor-area');
+        const STORAGE_KEY = 'journalEntries';
+
+        let currentEntryIndex = null;
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            };
+            return text.replace(/[&<>"']/g, function (m) {
+                return map[m];
+            });
+        }
+
+        function htmlToPlainTextWithNewlines(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+
+            function recurse(node) {
+                let text = '';
+                node.childNodes.forEach((child) => {
+                    if (child.nodeType === 3) {
+                        text += child.textContent;
+                    } else if (
+                        child.nodeType === 1 &&
+                        ['DIV', 'P', 'LI'].includes(child.tagName)
+                    ) {
+                        text += recurse(child) + '\n';
+                    } else if (child.nodeType === 1 && child.tagName === 'BR') {
+                        text += '\n';
+                    } else {
+                        text += recurse(child);
+                    }
+                });
+                return text;
+            }
+
+            return recurse(temp).replace(/\n+$/g, '');
+        }
+
+        function loadEntries() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveEntries(entries) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
+
+        function formatDateOnly(timestamp) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(timestamp).toLocaleDateString(undefined, options);
+        }
+
+        function renderSavedEntries() {
+            const entries = loadEntries();
+            if (entries.length === 0) {
+                savedList.innerHTML = 'No saved entries yet.';
+                return;
+            }
+            savedList.innerHTML = '';
+            entries.forEach((entry, index) => {
+                const container = document.createElement('div');
+                const date = formatDateOnly(entry.timestamp);
+                const plainText = entry.text.replace(/<[^>]*>/g, '');
+                const title = entry.title || plainText.substring(0, 30) + (plainText.length > 30 ? '...' : '');
+
+                const dateSpan = document.createElement('div');
+                dateSpan.className = 'entry-date';
+                dateSpan.textContent = date;
+
+                const titleSpan = document.createElement('div');
+                titleSpan.className = 'entry-title';
+                titleSpan.textContent = title;
+
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'entry-buttons';
+
+                const loadBtn = document.createElement('button');
+                loadBtn.textContent = 'Load';
+                loadBtn.onclick = () => {
+                    editor.innerHTML = entry.text;
+                    currentEntryIndex = index;
+                    showEditor();
+                    updateFormattingStates();
+                };
+
+                const delBtn = document.createElement('button');
+                delBtn.textContent = 'Delete';
+                delBtn.onclick = () => {
+                    if (confirm('Delete this entry?')) {
+                        const entries = loadEntries();
+                        entries.splice(index, 1);
+                        saveEntries(entries);
+                        renderSavedEntries();
+                        if (editor.innerHTML === entry.text) {
+                            editor.innerHTML = '';
+                            currentEntryIndex = null;
+                            updateFormattingStates();
+                        }
+                    }
+                };
+
+                buttonGroup.appendChild(loadBtn);
+                buttonGroup.appendChild(delBtn);
+
+                container.appendChild(dateSpan);
+                container.appendChild(titleSpan);
+                container.appendChild(buttonGroup);
+
+                savedList.appendChild(container);
+            });
+        }
+
+        function updateFormattingStates() {
+            document.querySelectorAll('.toolbar button[onclick]').forEach((button) => {
+                let cmdMatch = button.getAttribute('onclick').match(/'([^']+)'/);
+                if (!cmdMatch) return;
+                const cmd = cmdMatch[1];
+                const active = document.queryCommandState(cmd);
+                button.classList.toggle('active', active);
+            });
+        }
+
+        saveBtn.onclick = () => {
+            const html = editor.innerHTML.trim();
+            if (!html || html === '<br>') {
+                alert('Cannot save empty entry!');
+                return;
+            }
+
+            const entries = loadEntries();
+
+            if (currentEntryIndex !== null) {
+                entries[currentEntryIndex] = {
+                    text: html,
+                    title: entries[currentEntryIndex].title,
+                    timestamp: entries[currentEntryIndex].timestamp,
+                };
+            } else {
+                let title = prompt('Enter a title for this entry:');
+                if (title) title = title.trim();
+
+                entries.push({
+                    text: html,
+                    title: title || null,
+                    timestamp: Date.now(),
+                });
+                currentEntryIndex = entries.length - 1;
+            }
+
+            saveEntries(entries);
+            renderSavedEntries();
+            alert('Entry saved!');
+        };
+
+        newEntryBtn.onclick = () => {
+            if (confirm('Clear the editor and start a new entry? Unsaved changes will be lost.')) {
+                editor.innerHTML = '';
+                currentEntryIndex = null;
+                showEditor();
+                editor.focus();
+                updateFormattingStates();
+            }
+        };
+
+        latexPreviewBtn.onclick = () => {
+            const htmlContent = editor.innerHTML;
+            const content = htmlToPlainTextWithNewlines(htmlContent);
+
+            if (!content.trim()) {
+                alert('Editor is empty, cannot render preview.');
+                return;
+            }
+
+            const escapedContent = escapeHtml(content);
+            const htmlWithBreaks = escapedContent.replace(/\n/g, '<br>');
+
+            latexPreview.innerHTML = htmlWithBreaks;
+
+            renderMathInElement(latexPreview, {
+                delimiters: [
+                    { left: '\\[', right: '\\]', display: true },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                ],
+                throwOnError: false,
+            });
+
+            editorArea.classList.add('preview-active');
+
+            latexPreviewBtn.style.display = 'none';
+            backToEditorBtn.style.display = 'inline-block';
+        };
+
+        backToEditorBtn.onclick = () => {
+            editorArea.classList.remove('preview-active');
+            latexPreviewBtn.style.display = 'inline-block';
+            backToEditorBtn.style.display = 'none';
+            updateFormattingStates();
+        };
+
+        function insertFreshListAtCursor() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            const range = selection.getRangeAt(0);
+
+            if (range.startContainer.nodeType === 3) {
+                let text = range.startContainer.textContent;
+                text = text.replace(/-$/, '');
+                range.startContainer.textContent = text;
+                range.setStart(range.startContainer, text.length);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+
+            const ul = document.createElement('ul');
+            const li = document.createElement('li');
+            li.appendChild(document.createElement('br'));
+            ul.appendChild(li);
+
+            range.deleteContents();
+            range.insertNode(ul);
+
+            const newRange = document.createRange();
+            newRange.setStart(li, 0);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+
+            ul.scrollIntoView({ block: 'nearest' });
+        }
+
+        editor.addEventListener('keydown', (e) => {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            const range = selection.getRangeAt(0);
+            const node = range.startContainer;
+
+            if (node.nodeType === 3) {
+                const len = node.textContent.length;
+                if (range.startOffset > len) {
+                    range.setStart(node, len);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+
+            if (e.key === 'Tab') {
+                const li = node.nodeType === 3 ? node.parentElement.closest('li') : node.closest('li');
+                if (li) {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        document.execCommand('outdent');
+                    } else {
+                        document.execCommand('indent');
+                    }
+                    return;
+                }
+            }
+
+            if (e.key === ' ' && node.nodeType === 3) {
+                const textBeforeCursor = node.textContent.slice(0, range.startOffset);
+                if (/^\s*-\s*$/.test(textBeforeCursor)) {
+                    e.preventDefault();
+                    insertFreshListAtCursor();
+                    return;
+                }
+            }
+
+            if (e.key === 'Enter') {
+                const li = node.nodeType === 3 ? node.parentElement.closest('li') : node.closest('li');
+                if (li && li.textContent.trim() === '') {
+                    e.preventDefault();
+                    document.execCommand('outdent');
+                    return;
+                }
+            }
+        });
+
+        editor.addEventListener('keyup', updateFormattingStates);
+        editor.addEventListener('mouseup', updateFormattingStates);
+
+        function showEditor() {
+            editorArea.classList.remove('preview-active');
+            latexPreviewBtn.style.display = 'inline-block';
+            backToEditorBtn.style.display = 'none';
+        }
+
+        updateFormattingStates();
+        renderSavedEntries();
+    </script>
+</body>
+</html>
